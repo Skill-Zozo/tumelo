@@ -63,10 +63,7 @@ public class Doors {
 		
 		Button addRoomButton = new Button(shell, SWT.CENTER);
 		GridData gd_addRoomButton = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-		//gd_addRoomButton.heightHint = 35;
-		//gd_addRoomButton.horizontalAlignment = SWT.CENTER;
 		addRoomButton.setLayoutData(gd_addRoomButton);
-		//addRoomButton.setBounds(167, 49, 59, 25);
 		addRoomButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				lbl.setText("room1");
@@ -101,11 +98,7 @@ public class Doors {
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
-		//GridData gd_roomButton = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		GridData gd_roomButton = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-		//gd_roomButton.heightHint = 35;
-		//gd_roomButton.horizontalAlignment = SWT.CENTER;
-		//gd_roomButton.widthHint = 423;
 		roomButton.setLayoutData(gd_roomButton);
 		roomButton.setText(roomName);
 		shell.layout(true);

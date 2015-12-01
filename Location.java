@@ -6,8 +6,10 @@ import java.util.LinkedList;
 public class Location {
 	private String nameOfPlace;
 	private LinkedList<Room> rooms;
+	private Profile owner;
 	
-	public Location(String name) {
+	public Location(Profile owner, String name) {
+		this.owner = owner;
 		setNameOfPlace(name);
 		rooms = new LinkedList<>();
 	}
