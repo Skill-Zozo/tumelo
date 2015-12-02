@@ -29,6 +29,14 @@ public class Profile {
 			locations.remove(loc);
 	}
 	
+	public LinkedList<Location> getLocations() {
+		return this.locations;
+	}
+	
+	public boolean hasLocations() {
+		return !locations.isEmpty();
+	}
+	
 	public LinkedList<Device> getDevices() {
 		for(int i = 0; i < locations.size(); i++) {
 			Location loc = locations.get(i);
