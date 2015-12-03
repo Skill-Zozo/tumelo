@@ -13,7 +13,7 @@ public class Room {
 		devices = new LinkedList<>();
 	}
 
-	public String getRoomName() {
+	public String getName() {
 		return roomName;
 	}
 

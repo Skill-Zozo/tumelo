@@ -9,12 +9,12 @@ public class Location {
 	private Profile owner;
 	
 	public Location(Profile owner, String name) {
-		this.owner = owner;
+		this.setOwner(owner);
 		setNameOfPlace(name);
 		rooms = new LinkedList<>();
 	}
 
-	public String getNameOfPlace() {
+	public String getName() {
 		return nameOfPlace;
 	}
 
@@ -33,5 +33,13 @@ public class Location {
 	
 	public LinkedList<Room> getRooms() {
 		return this.rooms;
+	}
+
+	public Profile getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Profile owner) {
+		this.owner = owner;
 	}
 }

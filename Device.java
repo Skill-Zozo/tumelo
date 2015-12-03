@@ -11,6 +11,11 @@ public class Device {
 		setOn(state);
 	}
 
+	public Device(String name,Room room ) {
+		setNameofDevice(name);
+		setParentRoom(room);
+	}
+	
 	public String getNameofDevice() {
 		return nameofDevice;
 	}
