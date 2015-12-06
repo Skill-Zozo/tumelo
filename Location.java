@@ -42,4 +42,22 @@ public class Location {
 	public void setOwner(Profile owner) {
 		this.owner = owner;
 	}
+
+	public boolean hasRoom(String place) {
+		for(int i = 0; i < rooms.size(); i++ ) {
+			Room room = rooms.get(i);
+			if(room.getName().equalsIgnoreCase(place))
+				return true;
+		}
+		return false;
+	}
+	
+	public Room getRoom(String room) {
+		for(int i = 0; i < rooms.size(); i++ ) {
+			Room r = rooms.get(i);
+			if(r.getName().equalsIgnoreCase(room))
+				return r;
+		}
+		return null;
+	}
 }

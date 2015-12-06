@@ -47,4 +47,22 @@ public class Profile {
 		}
 		return devices;
 	}
+
+	public boolean hasLocation(String place) {
+		for(int i = 0; i < locations.size(); i++ ) {
+			Location loc = locations.get(i);
+			if(loc.getName().equalsIgnoreCase(place))
+				return true;
+		}
+		return false;
+	}
+	
+	public Location getLocation(String place) {
+		for(int i = 0; i < locations.size(); i++ ) {
+			Location loc = locations.get(i);
+			if(loc.getName().equalsIgnoreCase(place))
+				return loc;
+		}
+		return null;
+	}
 }

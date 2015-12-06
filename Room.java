@@ -41,4 +41,13 @@ public class Room {
 	public LinkedList<Device> getDevices() {
 		return this.devices;
 	}
+
+	public boolean hasDevice(String dev) {
+		for(int i = 0; i < devices.size(); i++ ) {
+			Device device = devices.get(i);
+			if(device.getNameofDevice().equalsIgnoreCase(dev))
+				return true;
+		}
+		return false;
+	}
 }
