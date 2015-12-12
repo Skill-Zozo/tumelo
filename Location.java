@@ -6,13 +6,15 @@ import java.util.LinkedList;
 public class Location {
 	private String nameOfPlace;
 	private LinkedList<Room> rooms;
+	private Profile owner;
 	
-	public Location(String name) {
+	public Location(Profile owner, String name) {
+		this.setOwner(owner);
 		setNameOfPlace(name);
 		rooms = new LinkedList<>();
 	}
 
-	public String getNameOfPlace() {
+	public String getName() {
 		return nameOfPlace;
 	}
 
@@ -31,5 +33,32 @@ public class Location {
 	
 	public LinkedList<Room> getRooms() {
 		return this.rooms;
+	}
+
+	public Profile getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Profile owner) {
+		this.owner = owner;
+		owner.addLocation(this);
+	}
+
+	public boolean hasRoom(String place) {
+		for(int i = 0; i < rooms.size(); i++ ) {
+			Room room = rooms.get(i);
+			if(room.getName().equalsIgnoreCase(place))
+				return true;
+		}
+		return false;
+	}
+	
+	public Room getRoom(String room) {
+		for(int i = 0; i < rooms.size(); i++ ) {
+			Room r = rooms.get(i);
+			if(r.getName().equalsIgnoreCase(room))
+				return r;
+		}
+		return null;
 	}
 }

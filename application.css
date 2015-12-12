@@ -1,0 +1,11 @@
+.hbox {
+	-fx-background-color: #4f4f4f;
+	-fx-padding: 15;
+	-fx-spacing: 10;
+}
+
+.scene {
+	-fx-background-color: #ff0000;
+	-fx-padding: 15;
+	-fx-spacing: 10;
+}

@@ -11,6 +11,11 @@ public class Device {
 		setOn(state);
 	}
 
+	public Device(String name,Room room ) {
+		setNameofDevice(name);
+		setParentRoom(room);
+	}
+	
 	public String getNameofDevice() {
 		return nameofDevice;
 	}
@@ -25,6 +30,7 @@ public class Device {
 
 	private void setParentRoom(Room parentRoom) {
 		this.parentRoom = parentRoom;
+		parentRoom.addDevice(this);
 	}
 
 	public boolean isOn() {

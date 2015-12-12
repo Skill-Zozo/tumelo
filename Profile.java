@@ -29,10 +29,40 @@ public class Profile {
 			locations.remove(loc);
 	}
 	
+	public LinkedList<Location> getLocations() {
+		return this.locations;
+	}
+	
+	public boolean hasLocations() {
+		return !locations.isEmpty();
+	}
+	
 	public LinkedList<Device> getDevices() {
-		/**
-		 * read from db
-		 * **/
+		for(int i = 0; i < locations.size(); i++) {
+			Location loc = locations.get(i);
+			for(int j = 0; j < loc.getRooms().size(); j++) {
+				Room room = loc.getRooms().get(j);
+				devices.addAll(room.getDevices());
+			}
+		}
 		return devices;
+	}
+
+	public boolean hasLocation(String place) {
+		for(int i = 0; i < locations.size(); i++ ) {
+			Location loc = locations.get(i);
+			if(loc.getName().equalsIgnoreCase(place))
+				return true;
+		}
+		return false;
+	}
+	
+	public Location getLocation(String place) {
+		for(int i = 0; i < locations.size(); i++ ) {
+			Location loc = locations.get(i);
+			if(loc.getName().equalsIgnoreCase(place))
+				return loc;
+		}
+		return null;
 	}
 }

@@ -13,7 +13,7 @@ public class Room {
 		devices = new LinkedList<>();
 	}
 
-	public String getRoomName() {
+	public String getName() {
 		return roomName;
 	}
 
@@ -27,6 +27,7 @@ public class Room {
 
 	private void setPlace(Location place) {
 		this.place = place;
+		place.addRoom(this);
 	}
 	
 	public void addDevice(Device d) {
@@ -40,5 +41,14 @@ public class Room {
 	
 	public LinkedList<Device> getDevices() {
 		return this.devices;
+	}
+
+	public boolean hasDevice(String dev) {
+		for(int i = 0; i < devices.size(); i++ ) {
+			Device device = devices.get(i);
+			if(device.getNameofDevice().equalsIgnoreCase(dev))
+				return true;
+		}
+		return false;
 	}
 }
