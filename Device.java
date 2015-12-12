@@ -30,6 +30,7 @@ public class Device {
 
 	private void setParentRoom(Room parentRoom) {
 		this.parentRoom = parentRoom;
+		parentRoom.addDevice(this);
 	}
 
 	public boolean isOn() {

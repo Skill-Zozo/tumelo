@@ -27,6 +27,7 @@ public class Room {
 
 	private void setPlace(Location place) {
 		this.place = place;
+		place.addRoom(this);
 	}
 	
 	public void addDevice(Device d) {
