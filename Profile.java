@@ -65,4 +65,12 @@ public class Profile {
 		}
 		return null;
 	}
+	
+	public String toString() {
+		String fin = this.name;
+		for(int i = 0; i < this.locations.size(); i++) {
+			fin = fin  + "\n\t" + this.locations.get(i).toString();
+		}
+		return fin;
+	}
 }

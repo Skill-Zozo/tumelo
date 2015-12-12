@@ -39,4 +39,8 @@ public class Device {
 	private void setOn(boolean state) {
 		this.on = state;
 	}
+	
+	public String toString() {
+		return this.nameofDevice;
+	}
 }
