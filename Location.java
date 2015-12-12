@@ -41,6 +41,7 @@ public class Location {
 
 	public void setOwner(Profile owner) {
 		this.owner = owner;
+		owner.addLocation(this);
 	}
 
 	public boolean hasRoom(String place) {
