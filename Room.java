@@ -51,4 +51,12 @@ public class Room {
 		}
 		return false;
 	}
+	
+	public String toString() {
+		String fin = this.roomName;
+		for(int i = 0; i < this.devices.size(); i++) {
+			fin = fin + "\n" + this.devices.get(i).toString();
+		}
+		return fin;
+	}
 }

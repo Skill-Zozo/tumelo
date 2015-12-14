@@ -61,4 +61,12 @@ public class Location {
 		}
 		return null;
 	}
+	
+	public String toString() {
+		String fin = this.nameOfPlace;
+		for(int i = 0; i < this.rooms.size(); i++){
+			fin = fin + "\n\t" + this.rooms.get(i).toString();
+		}
+		return fin;
+	}
 }
