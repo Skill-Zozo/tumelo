@@ -1,9 +1,8 @@
 package meloApp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -22,72 +21,151 @@ public class Connector {
 	private CloseableHttpClient httpclient;
 
 	public Connector() {
+		
 		httpclient = HttpClients.createDefault();
+		
 	}
 
-	public Profile getUser(String usr, String pwd) {
-		String hash = BCrypt.hashpw(pwd, BCrypt.gensalt(12));
+	public String login(String usr, String pwd) {
+		/**
+		 * sends login request to server with 
+		 * username=usr, password = pwd
+		 * returns a negative message if there is no such user
+		 * */
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("type", "login"));
 		nvps.add(new BasicNameValuePair("username", usr));
-		nvps.add(new BasicNameValuePair("password", hash));
-		JSONArray array_data= loginToServer(nvps);
+		nvps.add(new BasicNameValuePair("password", pwd));
+		JSONObject json = sendToServer(nvps);
 		try {
-			Object obj = array_data.get(0);
-			System.out.println(obj instanceof Profile);
-			Profile user = (Profile)(array_data.get(0));
-			return user;
+			JSONArray jArray = (JSONArray) json.get("state");
+			String state = (String) jArray.get(0);
+			if(state.contains("failed")) {
+				return state;
+			} else {
+				return state;
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "failed for reasons unknown";
+	}
+	
+	public Profile getUser(String usr, String pwd) {
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+		nvps.add(new BasicNameValuePair("type", "pull_data"));
+		nvps.add(new BasicNameValuePair("username", usr));
+		nvps.add(new BasicNameValuePair("password", pwd));
+		JSONObject json = sendToServer(nvps);
+		try {
+			JSONArray json_block = (JSONArray)json.get("state");
+			Object jobj = json_block.get(0);
+			if(jobj instanceof JSONObject) {
+				JSONObject jObj = (JSONObject) json_block.get(1);
+				String response = (String)(jObj.get("user"));
+				Profile user = buildUserData(usr,response);
+				return user;
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+	
+	
 
-	private JSONArray loginToServer(List<NameValuePair> nvps) {
+	private Profile buildUserData(String name, String arr) {
+		Profile user = new Profile(name);
+		String[] dbEntries = arr.split(";;");
+		for(int i = 0; i < dbEntries.length; i++) {
+			String[] attributes = dbEntries[i].split(",");
+			Location loc;
+			if(user.hasLocation(attributes[1])) {
+				loc = user.getLocation(attributes[1]);
+			} else {
+				loc = new Location(user, attributes[1]);
+			}
+			Room room;
+			if(loc.hasRoom(attributes[2])) {
+				room = loc.getRoom(attributes[2]);
+			} else {
+				room = new Room(attributes[2], loc);
+			}
+			new Device(attributes[3], room);
+		}
+		return user;
+	}
+
+	private JSONObject sendToServer(List<NameValuePair> nvps) {
+		JSONObject json = null;
+		HttpEntity entity = null;
 		try {
 			HttpPost httpPost = new HttpPost(
 					"http://137.158.58.29:8080/meloApp/Sever");
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 			CloseableHttpResponse response = httpclient.execute(httpPost);
-			System.out.println(response.getStatusLine());
-			HttpEntity entity = response.getEntity();
+			entity = response.getEntity();
 			String content = EntityUtils.toString(entity, "UTF-8");
-			JSONObject json = new JSONObject(content);
-			JSONArray usr = (JSONArray) json.get("user");
+			json = new JSONObject(content);
 			EntityUtils.consume(entity);
 			response.close();
-			return usr;
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				EntityUtils.consume(entity);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		return null;
+		return json;
+	}
+	
+	public String addDeviceTo(String user, String pwd, Device dev) {
+		Room room = dev.getParentRoom();
+		Location loc = room.getPlace();
+		List<NameValuePair> nvps = new ArrayList<>();
+		nvps.add(new BasicNameValuePair("user", user));
+		nvps.add(new BasicNameValuePair("password", pwd));
+		nvps.add(new BasicNameValuePair("type", "add"));
+		nvps.add(new BasicNameValuePair("device", dev.getNameofDevice()));
+		nvps.add(new BasicNameValuePair("room", room.getName()));
+		nvps.add(new BasicNameValuePair("location", loc.getName()));
+		JSONObject json = sendToServer(nvps);
+		JSONArray jArray;
+		try {
+			jArray = (JSONArray) json.get("state");
+			String status = (String)jArray.get(0);
+			return status;
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return "failed";
+	}
+	
+	public String signup(String usr, String pwd) {
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+		nvps.add(new BasicNameValuePair("type", "signup"));
+		nvps.add(new BasicNameValuePair("username", usr));
+		nvps.add(new BasicNameValuePair("password", pwd));
+		JSONObject json = sendToServer(nvps);
+		JSONArray status_array;
+		try {
+			status_array = (JSONArray)json.get("state");
+			return (String)(status_array.get(0));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "failed";
 	}
 
 	public static void main(String[] args) {
 		Connector conn = new Connector();
-		Profile user = conn.getUser("Banele", "secret");
-		System.out.println(user.toString());
-		/*CloseableHttpResponse response;
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost httpPost = new HttpPost(
-					"http://137.158.58.29:8080/meloApp/Sever");
-			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-			nvps.add(new BasicNameValuePair("username", "vip"));
-			nvps.add(new BasicNameValuePair("password", "secret"));
-			httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-			response = httpclient.execute(httpPost);
-			System.out.println(response.getStatusLine());
-			HttpEntity entity = response.getEntity();
-			String content = EntityUtils.toString(entity, "UTF-8");
-			JSONObject json = new JSONObject(content);
-			JSONArray usr = (JSONArray) json.get("user");
-			System.out.println(usr.get(0));
-			EntityUtils.consume(entity);
-			response.close();
-		} catch (IOException | ParseException | JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		Profile user = new Profile("dev1");
+		Location loc = new Location(user, "Work");
+		Room room = new Room("office", loc);
+		conn.addDeviceTo(user.getName(), "work", new Device("lamp", room));
 	}
 }

@@ -1,10 +1,7 @@
 package meloApp;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 
 import javafx.application.Application;
@@ -39,7 +36,9 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 	private LinkedList<Scene> prevScenes = new LinkedList<>();
-	Profile user;
+	private Profile user;
+	private static Connector conn;
+	private String pwrd = "";
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -50,23 +49,16 @@ public class Main extends Application {
 			gridpane.setPadding(new Insets(5));
 			gridpane.setHgap(10);
 			gridpane.setVgap(5);
-			Label signin = new Label("Sign in:");
-			gridpane.add(signin, 0, 1);
-			Button glogin = new Button("Google");
-			gridpane.add(glogin, 2, 1);
-			Button fblogin = new Button("Facebook");
-			gridpane.add(fblogin, 1, 1);
 			Label usrName = new Label("Username:");
 			gridpane.add(usrName, 0, 2);
 			final TextField usrNameText = new TextField();
-			gridpane.add(usrNameText, 0, 3, 5, 1);
+			gridpane.add(usrNameText, 0, 3, 18, 1);
 			Label pwd = new Label("Password:");
 			gridpane.add(pwd, 0, 4);
 			final PasswordField password = new PasswordField();
-			gridpane.add(password, 0, 5, 5, 1);
+			gridpane.add(password, 0, 5, 18, 1);
 			Button signinBtn = new Button("Sign in");
-			gridpane.add(signinBtn, 3, 7);
-			root.setCenter(gridpane);
+			gridpane.add(signinBtn, 6, 8);
 			final Scene scene = new Scene(root, 300, 200);
 			scene.getStylesheets().add(
 					getClass().getResource("application.css").toExternalForm());
@@ -74,85 +66,35 @@ public class Main extends Application {
 
 				@Override
 				public void handle(Event event) {
-					boolean valid = authenticate(usrNameText.getText(),
+					String status = conn.login(usrNameText.getText(), 
 							password.getText());
-					if (valid) {
+					if(status.contains("success")) {
+						user = conn.getUser(usrNameText.getText(), 
+							password.getText());
+						pwrd = password.getText();
 						prevScenes.add(scene);
 						locationScene(stage);
+						System.out.println(user);
+					} else {
+						status.replace("-", " ");
+						Label info = new Label(status.replace("failed_", ""));
+						info.textFillProperty();
+						gridpane.add(info, 0, 6, 5, 1);
+						gridpane.getChildren().remove(signinBtn);
+						gridpane.add(signinBtn, 6, 8, 5, 1);
 					}
 				}
 
 			});
+			stage.setTitle("Sign in");
+			root.setCenter(gridpane);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	private boolean authenticate(String usrname, String pwd) {
-		if (usrname.isEmpty())
-			return false;
-		try {
-			String entry = usrname + "," + pwd;
-			FileReader fr = new FileReader("users.txt");
-			BufferedReader br = new BufferedReader(fr);
-			for (String line = br.readLine(); line != null; line = br
-					.readLine()) {
-
-				if (entry.equals(entry)) {
-					br.close();
-					buildUserProfile(usrname);
-					return true;
-				}
-			}
-			br.close();
-			write(entry, "users.txt");
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	private void buildUserProfile(String usrname) {
-		try {
-			user = new Profile(usrname);
-			FileReader fr = new FileReader("db.txt");
-			BufferedReader br = new BufferedReader(fr);
-			for(String line = br.readLine(); line != null; line = br.readLine()) {
-				String[] dets = line.split(",");
-				if(dets[0].equalsIgnoreCase(usrname)) {
-					if(user.hasLocation(dets[1])) {
-						Location loc = user.getLocation(dets[1]);
-						Room room;
-						if(loc.hasRoom(dets[2].trim())) {
-							room = loc.getRoom(dets[2]);
-						} else {
-							room = new Room(dets[2].trim(),loc);
-							loc.addRoom(room);
-						}
-						if(!room.hasDevice(dets[3].trim())) {
-							Device dev = new Device(dets[3], room);
-							room.addDevice(dev);
-						}
-					} else {
-						Location loc = new Location(user, dets[1]);
-						Room room = new Room(dets[2], loc);
-						Device device = new Device(dets[3].trim(), room);
-						user.addLocation(loc);
-						loc.addRoom(room);
-						room.addDevice(device);
-					}
-				}
-			}
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-
+	
 	private HBox setupDevButton(Device dev) {
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER);
@@ -256,7 +198,7 @@ public class Main extends Application {
 					public void handle(Event event) {
 						if (!name.getText().isEmpty()) {
 							Device device = new Device(name.getText(), room);
-							room.addDevice(device);
+							conn.addDeviceTo(user.getName(), pwrd, device);
 							vbox.getChildren().removeAll(hbox, addDev);
 							HBox hbox = setupDevButton(device);
 							vbox.getChildren().addAll(hbox, addDev);
@@ -304,6 +246,7 @@ public class Main extends Application {
 	}
 	
 	private void roomScene(final Stage stage, final Location location) {
+		stage.setTitle(location.getName());
 		final Button addloc = new Button("+");
 		addloc.setShape(new Circle(3));
 		Group root = new Group();
@@ -340,6 +283,7 @@ public class Main extends Application {
 	}
 
 	private void locationScene(final Stage stage) {
+		stage.setTitle(user.getName());
 		Label locationLabel = new Label("Your locations");
 		locationLabel.setFont(Font.font("san-serif", 26));
 		locationLabel.underlineProperty();
@@ -436,6 +380,7 @@ public class Main extends Application {
 	}
 
 	public static void main(String[] args) {
+		conn = new Connector();
 		launch(args);
 	}
 }
