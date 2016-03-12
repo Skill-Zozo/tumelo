@@ -1,5 +1,3 @@
-package meloApp;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.LinkedList;
@@ -68,13 +66,12 @@ public class Main extends Application {
 				public void handle(Event event) {
 					String status = conn.login(usrNameText.getText(), 
 							password.getText());
-					if(status.contains("success")) {
+					if(status.contains("ok")) {
 						user = conn.getUser(usrNameText.getText(), 
 							password.getText());
 						pwrd = password.getText();
 						prevScenes.add(scene);
 						locationScene(stage);
-						System.out.println(user);
 					} else {
 						status.replace("-", " ");
 						Label info = new Label(status.replace("failed_", ""));

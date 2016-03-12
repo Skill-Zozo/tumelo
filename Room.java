@@ -1,5 +1,3 @@
-package meloApp;
-
 import java.util.LinkedList;
 
 public class Room {

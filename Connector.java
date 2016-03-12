@@ -1,5 +1,3 @@
-package meloApp;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +56,12 @@ public class Connector {
 		nvps.add(new BasicNameValuePair("username", usr));
 		nvps.add(new BasicNameValuePair("password", pwd));
 		JSONObject json = sendToServer(nvps);
+		System.out.println(json);
 		try {
-			JSONArray json_block = (JSONArray)json.get("state");
-			Object jobj = json_block.get(0);
-			if(jobj instanceof JSONObject) {
-				JSONObject jObj = (JSONObject) json_block.get(1);
-				String response = (String)(jObj.get("user"));
-				Profile user = buildUserData(usr,response);
-				return user;
-			}
+			JSONArray json_block = (JSONArray)json.get("user");
+			String response = (String) json_block.get(0);
+			Profile user = buildUserData(usr,response);
+			return user;
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -102,7 +97,7 @@ public class Connector {
 		HttpEntity entity = null;
 		try {
 			HttpPost httpPost = new HttpPost(
-					"http://137.158.58.29:8080/meloApp/Sever");
+					"http://localhost:8080/testshit/Sever");
 			httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			entity = response.getEntity();

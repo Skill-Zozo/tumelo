@@ -1,5 +1,3 @@
-package meloApp;
-
 public class Device {
 	private boolean on;
 	private String nameofDevice;
